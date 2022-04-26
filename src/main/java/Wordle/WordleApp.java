@@ -7,6 +7,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+
+
+
 public class WordleApp extends Application{
 
     public static void main(String[] args) {
@@ -15,7 +18,7 @@ public class WordleApp extends Application{
     
     @Override
     public void start(Stage primaryStage) throws IOException {
-        primaryStage.setTitle("Wordle-clone");
+        primaryStage.setTitle("Woerdel");
         primaryStage.setScene(new Scene(FXMLLoader.load(getClass().getResource("Wordle.fxml"))));
         primaryStage.show();
     }

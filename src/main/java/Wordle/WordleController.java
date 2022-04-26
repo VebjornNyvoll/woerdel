@@ -2,13 +2,30 @@ package Wordle;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 
 public class WordleController {
+    Wordle wordle = new Wordle();
+
     @FXML
-    private Button qkey, wkey, ekey, rkey, tkey, ykey, ukey, ikey, okey, pkey, akey, skey, dkey, fkey, gkey, hkey, jkey, kkey, lkey, zkey, xkey, ckey, vkey, bkey, nkey, mkey, enter, backspace;
+    private TextField guessField;
+
+    @FXML
+    private Button startButton;
+
     
     @FXML
-    private void handleQ(){
-        // Push letter Q to thing
+    private void handleGuessField(){
+        if(wordle.checkWord(guessField.getText())){
+            wordle.submitWord(guessField.getText());
+        }
+        
     }
+    
+    @FXML
+    private void initialize(){
+        wordle = new Wordle();
+        wordle.readFile();
+    }
+
 }
