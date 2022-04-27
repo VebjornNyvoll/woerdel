@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -15,7 +17,14 @@ public class Wordle{
     private List<String> possibleWords = new ArrayList<>();
     private String possibleWordsFilename = "Wordle/possibleWords.txt";
     private String secretWord;
-    
+
+    private char[] greenLetters = {'?','?','?','?','?'};
+    private char[] yellowLetters = {'?','?','?','?','?'};
+
+    public String getSecretWord(){
+        return secretWord;
+    }
+
     private void generateSecretWord(){
         secretWord = possibleWords.get(new Random().nextInt(possibleWords.size()));
     }
@@ -68,21 +77,56 @@ public class Wordle{
         return guessedWords.size();
     }
 
-    public Character generateCharBoxColor(String guessedWord, int i, char[] cArray){
+    public void generateColorArrays(String guessedWord, char[] cArray){
+        System.out.println("GENERATE COLOR ARRAYS CALLED");
         char[] secretArray = secretWord.toCharArray();
-        char letter = cArray[i];
+        String secretWordCopy = secretWord;
+        System.out.println(secretWordCopy);
+        for (int k = 0; k<5; k++ ){
+            greenLetters[k] = '?';
+            yellowLetters[k] = '?';
+        }
+       
+
+        for (int i = 0; i<5; i++ ){
+            char l = cArray[i];
+            if(l == secretArray[i]){
+                greenLetters[i] = l;
+                secretArray[i] = '*';
+                secretWordCopy = String.valueOf(secretArray);
+                // System.out.println("green " + String.valueOf(l));
+            }
+        }
+
+        for (int j = 0; j<5; j++ ){
+            char l = cArray[j];
+            if(secretWordCopy.contains(String.valueOf(l)) && l != greenLetters[j]){
+                yellowLetters[j] = l;
+                secretWordCopy = secretWordCopy.replaceFirst(String.valueOf(l), "^");
+                // System.out.println("secretWordCopy: " + secretWordCopy);
+                secretArray = secretWordCopy.toCharArray();
+                // System.out.println("secretWordCopy: " + secretWordCopy);
+                // System.out.println("secretArray: " + secretArray.toString());
+                // System.out.println("yellow " + String.valueOf(l));
+            }
+        }
+        // System.out.println(greenLetters);
+        // System.out.println(yellowLetters);
+        // System.out.println(secretWordCopy);
         
 
-        if(letter == secretArray[i]){
+    }
+
+    public Character generateCharBoxColor(char[] lowerArray, int i){
+        if(lowerArray[i] == greenLetters[i]){
             return 'g';
         }
-        else if(secretWord.contains(String.valueOf(letter))){
+        else if(lowerArray[i] == yellowLetters[i]){
             return 'y';
         }
-        else {
+        else{
             return 'b';
         }
-
     }
 
 }
