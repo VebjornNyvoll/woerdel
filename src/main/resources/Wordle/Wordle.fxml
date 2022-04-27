@@ -10,9 +10,23 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="backgroundpane" fx:id="charGrid" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="888.0" prefWidth="788.0" style="-fx-background-color: linear-gradient(to bottom, #230618, black);" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleController">
+<AnchorPane id="backgroundpane" fx:id="backgroundPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="888.0" prefWidth="788.0" style="-fx-background-color: linear-gradient(to bottom, #230618, black);" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleController">
    <children>
-      <GridPane id="chargrid" gridLinesVisible="true" layoutX="204.0" layoutY="196.0" prefHeight="410.0" prefWidth="380.0">
+      <ImageView id="tittelbilde" fitHeight="154.0" fitWidth="444.0" layoutX="172.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@wordletitle.png" />
+         </image>
+      </ImageView>
+      <TextField fx:id="guessField" layoutX="268.0" layoutY="653.0" onAction="#handleGuessField" prefHeight="41.0" prefWidth="252.0" promptText="Gjett her!">
+         <font>
+            <Font name="Arial" size="18.0" />
+         </font>
+      </TextField>
+      <Button fx:id="startButton" layoutX="52.0" layoutY="653.0" mnemonicParsing="false" onAction="#initialize" prefHeight="41.0" prefWidth="111.0" text="Restart">
+         <font>
+            <Font name="Arial" size="18.0" />
+         </font></Button>
+      <GridPane id="chargrid" fx:id="charGrid" gridLinesVisible="true" layoutX="204.0" layoutY="195.0" prefHeight="410.0" prefWidth="380.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -29,19 +43,5 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
       </GridPane>
-      <ImageView id="tittelbilde" fitHeight="154.0" fitWidth="444.0" layoutX="172.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@wordletitle.png" />
-         </image>
-      </ImageView>
-      <TextField fx:id="guessField" layoutX="268.0" layoutY="653.0" onAction="#handleGuessField" prefHeight="41.0" prefWidth="252.0" promptText="Gjett her!">
-         <font>
-            <Font name="Arial" size="18.0" />
-         </font>
-      </TextField>
-      <Button fx:id="startButton" layoutX="52.0" layoutY="653.0" mnemonicParsing="false" onAction="#initialize" prefHeight="41.0" prefWidth="111.0" text="Restart">
-         <font>
-            <Font name="Arial" size="18.0" />
-         </font></Button>
    </children>
 </AnchorPane>
