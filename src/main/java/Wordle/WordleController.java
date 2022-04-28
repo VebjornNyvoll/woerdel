@@ -1,5 +1,6 @@
 package Wordle;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import javafx.fxml.FXML;
@@ -26,35 +27,44 @@ public class WordleController {
 
     @FXML
     private void handleGuessField(){
+        boolean victory = false;
         if(wordle.checkWord(guessField.getText().toLowerCase())){
           
             wordle.submitWord(guessField.getText().toLowerCase());
             fillGrid(guessField.getText().toUpperCase());
-            guessField.setText("");
+            
+            if(guessField.getText().equalsIgnoreCase(wordle.getSecretWord())){
+                victoryAlert();
+                victory = true;
+                // SUBMIT WIN TIL FIL
+            }
 
             if(wordle.getGuessedWordCount() == 6){
                 guessField.setEditable(false);
-                lossAlert();
+                if(!victory){
+                    lossAlert();
+                }
             }
+            guessField.setText("");
         }
         
     }
 
     private void victoryAlert(){
         Alert victoryAlert = new Alert(AlertType.INFORMATION);
-        victoryAlert.setTitle("CONGRATULATIONS!");
+        victoryAlert.setTitle("GRATULERER!");
         victoryAlert.setHeaderText(null);
-        victoryAlert.setContentText("You won in " + wordle.getGuessedWordCount() + " guesses! Great job!");
-        victoryAlert.getButtonTypes().setAll(new ButtonType("WOOOHOOO!!! LET'S PLAY SOME MORE!"));
+        victoryAlert.setContentText("Du vant på " + wordle.getGuessedWordCount() + " gjett! Sykt bra jobba!");
+        victoryAlert.getButtonTypes().setAll(new ButtonType("WOOOHOOO!!! JEG VIL SPILLE MER!"));
         victoryAlert.showAndWait();
     }
 
     private void lossAlert(){
         Alert lossAlert = new Alert(AlertType.INFORMATION);
-        lossAlert.setTitle("My condolences");
-        lossAlert.setHeaderText(null);
-        lossAlert.setContentText("Sadly, you were not able to guess the word within your 6 guesses. The secret word was: " + wordle.getSecretWord() + ". Better luck next time!");
-        lossAlert.getButtonTypes().setAll(new ButtonType("I can do better! Let me try again!"));
+        lossAlert.setTitle("Jeg kondolerer");
+        lossAlert.setHeaderText("Du tapte :(");
+        lossAlert.setContentText("Dessverre greide du ikke å gjette riktig svar i løpet av dine 6 forsøk.\nDet hemmelige ordet var : " + wordle.getSecretWord() + ".\nBedre lykke neste gang!");
+        lossAlert.getButtonTypes().setAll(new ButtonType("Jeg lover jeg kan gjøre det bedre! LA MEG SPILLE IGJEN!"));
         lossAlert.showAndWait();
     }
 
@@ -73,9 +83,31 @@ public class WordleController {
     }
     
     @FXML
-    private void initialize(){
+    private void initialize() throws FileNotFoundException{
+        Wordle wordle = new Wordle();
+        wordle.readPossibleWords();
+        wordle.initiateReadSave("guessedWords.txt");
+        wordle.generateSecretWord();
+        for (String word : wordle.getGuessedWords()) {
+            fillGrid(word);
+        }
+        System.out.println(wordle.getSecretWord());
+        System.out.println(wordle.getPossibleWordCount());
+    }
+
+    @FXML
+    private void restart(){
         wordle = new Wordle();
-        wordle.readFile();
+        clearCharGrid();
+        wordle.wipeSecretWordFile();
+        wordle.readPossibleWords();
+        guessField.setEditable(true);
+    }
+
+    private void clearCharGrid(){
+        charGrid.setGridLinesVisible(false);
+        charGrid.getChildren().clear();
+        charGrid.setGridLinesVisible(true);
     }
 
     private BorderPane createPane(CharBox cBox){

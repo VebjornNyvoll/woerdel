@@ -1,13 +1,13 @@
 package Wordle;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -25,42 +25,65 @@ public class Wordle{
         return secretWord;
     }
 
-    private void generateSecretWord(){
-        secretWord = possibleWords.get(new Random().nextInt(possibleWords.size()));
+    public int getPossibleWordCount(){
+        return possibleWords.size();
     }
 
-    public void readFile(){
-      InputStream is = this.getClass().getClassLoader().getResourceAsStream(possibleWordsFilename);
-      if (is == null) {
-          throw new IllegalArgumentException("fant ikke fila sry " + possibleWordsFilename);
-      } else {
-          try (InputStreamReader isReader = new InputStreamReader(is, StandardCharsets.UTF_8);
-          BufferedReader reader = new BufferedReader(isReader)) {
-              String line;
-              while ((line = reader.readLine()) != null) {
-                  possibleWords.add(line);
-              }
-          } catch (IOException ie) {
-              ie.printStackTrace();
-              System.out.println("dammit");
-          }
-      }
-      //System.out.println(possibleWords);
-      generateSecretWord();
-      System.out.println(secretWord);
+    public void generateSecretWord() throws FileNotFoundException{
+        SaveHandler saveHandler = new SaveHandler();
+        String previousSecret = saveHandler.readSecretWord();
+        if(previousSecret == null){
+            System.out.println("Ingen tidligere save funnet. Genererer nytt ord.");
+            secretWord = possibleWords.get(new Random().nextInt(possibleWords.size()));
+        }else{
+            secretWord = previousSecret;
+            System.out.println("Tidligere save funnet. Hemmelig ord lastet.");
+        }
+        
     }
 
+    public void readPossibleWords(){
+        SaveHandler saveHandler = new SaveHandler();
+        possibleWords = saveHandler.readPossibleWords(possibleWordsFilename, possibleWords);
+        System.out.println("Reading possibleWords!");
+        System.out.println(possibleWords);
+    }
+
+    public void initiateReadSave(String filename) throws FileNotFoundException{
+    //   InputStream is = this.getClass().getClassLoader().getResourceAsStream(possibleWordsFilename);
+    //   if (is == null) {
+    //       throw new IllegalArgumentException("fant ikke fila sry " + possibleWordsFilename);
+    //   } else {
+    //       try (InputStreamReader isReader = new InputStreamReader(is, StandardCharsets.UTF_8);
+    //       BufferedReader reader = new BufferedReader(isReader)) {
+    //           String line;
+    //           while ((line = reader.readLine()) != null) {
+    //               possibleWords.add(line);
+    //           }
+    //       } catch (IOException ie) {
+    //           ie.printStackTrace();
+    //           System.out.println("dammit");
+    //       }
+    //   }
+        SaveHandler saveHandler = new SaveHandler();
+        if(saveHandler.hasData(possibleWordsFilename))
+        guessedWords = saveHandler.readSave(possibleWordsFilename);
+
+        System.out.println(guessedWords);
+    }
+
+    public ArrayList<String> getGuessedWords(){
+        ArrayList<String> guessedWordsCopy = guessedWords;
+        return guessedWordsCopy;
+    }
 
     public void submitWord(String word){
         if(checkWord(word)){
             guessedWords.add(word);
             // Controller creates panes
-                
-            // LAGE NOE CHARACTERBOKSER MED CHARACTERS OG WHAT NOT
-            //Word guessedWord = new Word();
         }
         else {
-            System.out.println("nein nein, ikke godkjent ord");
+            System.out.println("Word not approved.");
         }
     }
 
@@ -69,6 +92,10 @@ public class Wordle{
             return true;
         }
         else{
+            System.out.println("In checkword:");
+            System.out.println(word);
+            System.out.println(possibleWords);
+            System.out.println("returned false.");
             return false;
         }
     }
@@ -78,10 +105,9 @@ public class Wordle{
     }
 
     public void generateColorArrays(String guessedWord, char[] cArray){
-        System.out.println("GENERATE COLOR ARRAYS CALLED");
         char[] secretArray = secretWord.toCharArray();
         String secretWordCopy = secretWord;
-        System.out.println(secretWordCopy);
+
         for (int k = 0; k<5; k++ ){
             greenLetters[k] = '?';
             yellowLetters[k] = '?';
@@ -94,7 +120,6 @@ public class Wordle{
                 greenLetters[i] = l;
                 secretArray[i] = '*';
                 secretWordCopy = String.valueOf(secretArray);
-                // System.out.println("green " + String.valueOf(l));
             }
         }
 
@@ -103,16 +128,9 @@ public class Wordle{
             if(secretWordCopy.contains(String.valueOf(l)) && l != greenLetters[j]){
                 yellowLetters[j] = l;
                 secretWordCopy = secretWordCopy.replaceFirst(String.valueOf(l), "^");
-                // System.out.println("secretWordCopy: " + secretWordCopy);
                 secretArray = secretWordCopy.toCharArray();
-                // System.out.println("secretWordCopy: " + secretWordCopy);
-                // System.out.println("secretArray: " + secretArray.toString());
-                // System.out.println("yellow " + String.valueOf(l));
             }
         }
-        // System.out.println(greenLetters);
-        // System.out.println(yellowLetters);
-        // System.out.println(secretWordCopy);
         
 
     }
@@ -127,6 +145,11 @@ public class Wordle{
         else{
             return 'b';
         }
+    }
+
+    public void wipeSecretWordFile(){
+        SaveHandler saveHandler = new SaveHandler();
+        saveHandler.writeToFile("", "secretWord.txt");
     }
 
 }
