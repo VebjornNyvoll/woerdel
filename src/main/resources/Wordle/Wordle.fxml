@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -8,11 +9,15 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.RadialGradient?>
+<?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane id="backgroundpane" fx:id="backgroundPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="888.0" prefWidth="788.0" style="-fx-background-color: linear-gradient(to bottom, #230618, black);" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Wordle.WordleController">
    <children>
-      <ImageView id="tittelbilde" fitHeight="154.0" fitWidth="444.0" layoutX="172.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView id="tittelbilde" fx:id="titlePicture" fitHeight="154.0" fitWidth="444.0" layoutX="172.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@wordletitle.png" />
          </image>
@@ -22,7 +27,7 @@
             <Font name="Arial" size="18.0" />
          </font>
       </TextField>
-      <Button fx:id="startButton" layoutX="52.0" layoutY="653.0" mnemonicParsing="false" onAction="#restart" prefHeight="41.0" prefWidth="111.0" text="Restart">
+      <Button fx:id="startButton" layoutX="67.0" layoutY="752.0" mnemonicParsing="false" onAction="#restart" prefHeight="41.0" prefWidth="111.0" text="Restart">
          <font>
             <Font name="Arial" size="18.0" />
          </font></Button>
@@ -43,5 +48,41 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
       </GridPane>
+      <Text fx:id="helpText" fill="RED" layoutX="584.0" layoutY="632.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="121.13671875">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Text>
+      <RadioButton fx:id="setEnglish" layoutX="76.0" layoutY="640.0" mnemonicParsing="false" onAction="#handleSetEnglish" selected="true" text="Engelsk" textFill="#eeeeee">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </RadioButton>
+      <RadioButton fx:id="setStarWars" layoutX="76.0" layoutY="674.0" mnemonicParsing="false" onAction="#handleSetStarWars" text="STAR WARS">
+         <font>
+            <Font name="Segoe MDL2 Assets" size="18.0" />
+         </font>
+         <textFill>
+            <RadialGradient centerX="0.5441988950276243" centerY="0.3815165876777251" radius="0.7758620689655172">
+               <stops>
+                  <Stop>
+                     <color>
+                        <Color red="0.9166666865348816" green="1.0" />
+                     </color>
+                  </Stop>
+                  <Stop offset="1.0">
+                     <color>
+                        <Color />
+                     </color>
+                  </Stop>
+               </stops>
+            </RadialGradient>
+         </textFill>
+      </RadioButton>
+      <ImageView id="tittelbilde" fx:id="starWarsTitle" fitHeight="154.0" fitWidth="444.0" layoutX="172.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@starwarstitle.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>

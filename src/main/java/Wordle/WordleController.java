@@ -1,6 +1,7 @@
 package Wordle;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import javafx.fxml.FXML;
@@ -8,16 +9,28 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 
 public class WordleController {
     Wordle wordle = new Wordle();
 
     @FXML
+    private ImageView titlePicture, starWarsTitle;
+
+    @FXML
+    private RadioButton setEnglish, setStarWars;
+
+    @FXML
     private TextField guessField;
+
+    @FXML 
+    private Text helpText;
 
     @FXML
     private Button startButton;
@@ -26,12 +39,39 @@ public class WordleController {
     private GridPane charGrid;
 
     @FXML
-    private void handleGuessField(){
+    private void handleSetStarWars() throws FileNotFoundException{
+        setStarWars.setDisable(true);
+        setEnglish.setDisable(false);
+        setEnglish.setSelected(false);
+        setStarWars.setSelected(true);
+        wordle.setStarWarsMode(true);
+        wordle.swapLanguage();
+        wordle.readPossibleWords();
+        restart();
+        starWarsTitle.setVisible(true);
+    }
+
+    @FXML
+    private void handleSetEnglish() throws FileNotFoundException{
+        setStarWars.setDisable(false);
+        setEnglish.setDisable(true);
+        setEnglish.setSelected(true);
+        setStarWars.setSelected(false);
+        wordle.setStarWarsMode(false);
+        wordle.swapLanguage();
+        restart();
+        starWarsTitle.setVisible(false);
+    }
+
+    @FXML
+    private void handleGuessField() throws IOException{
         boolean victory = false;
+        ISaveHandler saveHandler = new SaveHandler();
         if(wordle.checkWord(guessField.getText().toLowerCase())){
           
             wordle.submitWord(guessField.getText().toLowerCase());
             fillGrid(guessField.getText().toUpperCase());
+            saveHandler.writeSave(guessField.getText().toLowerCase(), "Wordle/guessedWords.txt");
             
             if(guessField.getText().equalsIgnoreCase(wordle.getSecretWord())){
                 victoryAlert();
@@ -46,6 +86,18 @@ public class WordleController {
                 }
             }
             guessField.setText("");
+            helpText.setText("");
+        }
+        else {
+            if(guessField.getText().toLowerCase().length() != 5){
+                helpText.setText("Ugyldig ord! Ordet ditt må være nøyaktig 5 bokstaver langt!");
+            }
+            else if(starWarsTitle.isVisible()==true){
+                helpText.setText("Ugyldig ord! Ordet ditt må være et gyldig ord i Star Wars! (Og selvfølgelig bare fra mitt personlige utvalg)");
+            } 
+            else {
+                helpText.setText("Ugyldig ord! Ordet ditt må være et gyldig engelsk ord!");
+            }
         }
         
     }
@@ -72,35 +124,50 @@ public class WordleController {
         String lowercase = guessedWord.toLowerCase();
         char[] lowerArray = lowercase.toCharArray();
         char[] cArray = guessedWord.toCharArray();
-
-         wordle.generateColorArrays(guessedWord, lowerArray);
+        
+        wordle.addToWordsInGrid(guessedWord);
+        wordle.generateColorArrays(guessedWord, lowerArray);
 
         for (int i = 0; i<5; i++ ) {
             Character c = cArray[i];
             CharBox cbox = new CharBox(c, wordle.generateCharBoxColor(lowerArray, i));
-            charGrid.add(createPane(cbox), (i + wordle.getGuessedWordCount() * 5 - 5) % 5, (i + wordle.getGuessedWordCount() * 5 - 5) / 5);
+            charGrid.add(createPane(cbox), (i + wordle.getWordsInGridCount() * 5 - 5) % 5, (i + wordle.getWordsInGridCount() * 5 - 5) / 5);
         }
+    }
+
+    private void initializeInStarWarsMode() throws FileNotFoundException{
+        setStarWars.setDisable(true);
+        setEnglish.setDisable(false);
+        setEnglish.setSelected(false);
+        setStarWars.setSelected(true);
+        wordle.setStarWarsMode(true);
+        wordle.swapLanguage();
+        starWarsTitle.setVisible(true);
     }
     
     @FXML
     private void initialize() throws FileNotFoundException{
-        Wordle wordle = new Wordle();
+        wordle.loadStarWarsMode();
+        if(wordle.isStarWarsMode()){
+            initializeInStarWarsMode();
+        }
         wordle.readPossibleWords();
         wordle.initiateReadSave("guessedWords.txt");
         wordle.generateSecretWord();
+        System.out.println(wordle.getGuessedWords());
         for (String word : wordle.getGuessedWords()) {
-            fillGrid(word);
+            fillGrid(word.toUpperCase());
         }
-        System.out.println(wordle.getSecretWord());
         System.out.println(wordle.getPossibleWordCount());
     }
 
     @FXML
-    private void restart(){
-        wordle = new Wordle();
+    private void restart() throws FileNotFoundException{
         clearCharGrid();
-        wordle.wipeSecretWordFile();
+        wordle.wipeSecretAndGuessedWordFile();
+        wordle.wipeGuessedWords();
         wordle.readPossibleWords();
+        wordle.generateSecretWord();
         guessField.setEditable(true);
     }
 

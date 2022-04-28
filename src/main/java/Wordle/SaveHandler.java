@@ -1,6 +1,7 @@
 package Wordle;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -9,25 +10,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class SaveHandler implements ISaveHandler{
     private String secretWordFilename = "Wordle/secretWord.txt";
-    
+
+    @Override
 	public void writeToFile(String text, String file) {
 		try {
-			String path = String.valueOf(Paths.get("src", "main", "java", "resources", "Wordle", file));
-			FileWriter fileWriter = new FileWriter(path);
+			FileWriter fileWriter = new FileWriter(getFile(file));
 			fileWriter.write(text);
 			fileWriter.close();
-			System.out.println("Lagret til secretWord.txt");
+			System.out.println("Lagret " + text + " i " + file);
 		}
 		catch(IOException ie){
-			System.out.println("Feil under skriving til savefile.txt");
+			System.out.println("Feil under skriving til " + file);
 			ie.printStackTrace();
 		}
 
@@ -37,17 +36,30 @@ public class SaveHandler implements ISaveHandler{
     @Override
     public String readSecretWord() throws FileNotFoundException{
         try(Scanner scanner = new Scanner(getFile(secretWordFilename))){
-            String secretWord = scanner.nextLine();
-            return secretWord;
-        } catch(FileNotFoundException fnfe) {
-            return null;
+            while(scanner.hasNext()){
+                String word = scanner.nextLine();
+                return word;
+            }
         }
+        return null;
+  
+    }
+
+    public String readStarWarsMode() throws FileNotFoundException{
+        try(Scanner scanner = new Scanner(getFile("Wordle/starWarsMode.txt"))){
+            while(scanner.hasNext()){
+                String word = scanner.nextLine();
+                return word;
+            }
+        }
+        return null;
+  
     }
 
     @Override
-    public void writeSave(String text, String filename) throws FileNotFoundException{
-        try(PrintWriter writer = new PrintWriter(getFile(filename))){
-            writer.println(text);
+    public void writeSave(String text, String filename) throws IOException{
+        try(PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(getFile(filename), true)))){
+            writer.append(text + "\n");
         }
     }
 
@@ -85,8 +97,9 @@ public class SaveHandler implements ISaveHandler{
         return list;
       }
 
-    private static File getFile(String filename){
-        return new File(filename);
+    private File getFile(String filename){
+        System.out.println(this.getClass().getClassLoader().getResource(filename).toExternalForm().replace("file:/", ""));
+        return new File(this.getClass().getClassLoader().getResource(filename).toExternalForm().replace("file:/", ""));
     }
 
     @Override

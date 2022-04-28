@@ -1,12 +1,6 @@
 package Wordle;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -14,12 +8,53 @@ import java.util.Random;
 public class Wordle{
     
     private ArrayList<String> guessedWords = new ArrayList<>();
+    private ArrayList<String> wordsInGrid = new ArrayList<>();
     private List<String> possibleWords = new ArrayList<>();
     private String possibleWordsFilename = "Wordle/possibleWords.txt";
     private String secretWord;
+    private boolean starWarsMode = false;
 
     private char[] greenLetters = {'?','?','?','?','?'};
     private char[] yellowLetters = {'?','?','?','?','?'};
+
+    public void setStarWarsMode(boolean bool){
+        starWarsMode = bool;
+        ISaveHandler saveHandler = new SaveHandler();
+        saveHandler.writeToFile(String.valueOf(bool), "Wordle/starWarsMode.txt");
+        System.out.println("starWarsMode set to " + bool);
+    }
+
+    public void loadStarWarsMode() throws FileNotFoundException{
+        ISaveHandler saveHandler = new SaveHandler();
+        starWarsMode = Boolean.parseBoolean(saveHandler.readStarWarsMode());
+    }
+
+    public boolean isStarWarsMode(){
+        return starWarsMode;
+    }
+
+    public void swapLanguage() throws FileNotFoundException{
+        if(possibleWordsFilename == "Wordle/possibleWords.txt"){
+            possibleWordsFilename = "Wordle/starWarsWords.txt";
+            System.out.println("SWAPPING TO STAR WARS");
+            possibleWords.clear();
+            readPossibleWords();
+            generateSecretWord();
+        } else {
+            possibleWordsFilename = "Wordle/possibleWords.txt";
+            possibleWords.clear();
+            readPossibleWords();
+            generateSecretWord();
+        }
+    }
+
+    public int getWordsInGridCount(){
+        return wordsInGrid.size();
+    }
+
+    public void addToWordsInGrid(String word){
+        wordsInGrid.add(word);
+    }
 
     public String getSecretWord(){
         return secretWord;
@@ -35,9 +70,11 @@ public class Wordle{
         if(previousSecret == null){
             System.out.println("Ingen tidligere save funnet. Genererer nytt ord.");
             secretWord = possibleWords.get(new Random().nextInt(possibleWords.size()));
+            saveHandler.writeToFile(secretWord, "Wordle/secretWord.txt");
+            System.out.println(secretWord);
         }else{
             secretWord = previousSecret;
-            System.out.println("Tidligere save funnet. Hemmelig ord lastet.");
+            System.out.println("Tidligere save funnet. Hemmelig ord lastet. " + secretWord);
         }
         
     }
@@ -46,7 +83,6 @@ public class Wordle{
         SaveHandler saveHandler = new SaveHandler();
         possibleWords = saveHandler.readPossibleWords(possibleWordsFilename, possibleWords);
         System.out.println("Reading possibleWords!");
-        System.out.println(possibleWords);
     }
 
     public void initiateReadSave(String filename) throws FileNotFoundException{
@@ -66,8 +102,8 @@ public class Wordle{
     //       }
     //   }
         SaveHandler saveHandler = new SaveHandler();
-        if(saveHandler.hasData(possibleWordsFilename))
-        guessedWords = saveHandler.readSave(possibleWordsFilename);
+        if(saveHandler.hasData("Wordle/guessedWords.txt"))
+        guessedWords = saveHandler.readSave("Wordle/guessedWords.txt");
 
         System.out.println(guessedWords);
     }
@@ -94,7 +130,6 @@ public class Wordle{
         else{
             System.out.println("In checkword:");
             System.out.println(word);
-            System.out.println(possibleWords);
             System.out.println("returned false.");
             return false;
         }
@@ -147,9 +182,15 @@ public class Wordle{
         }
     }
 
-    public void wipeSecretWordFile(){
+    public void wipeSecretAndGuessedWordFile(){
         SaveHandler saveHandler = new SaveHandler();
-        saveHandler.writeToFile("", "secretWord.txt");
+        saveHandler.writeToFile("", "Wordle/secretWord.txt");
+        saveHandler.writeToFile("", "Wordle/guessedWords.txt");
     }
 
+    public void wipeGuessedWords(){
+        guessedWords.clear();
+        wordsInGrid.clear();
+
+    }
 }
