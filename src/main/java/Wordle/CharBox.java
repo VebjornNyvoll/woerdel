@@ -17,6 +17,7 @@ public class CharBox {
     }
 
     public String getColorAsString(){
+        // Returns the intended color for CharBox. 
         String colorString = "black";
         
         switch(this.getColor()){

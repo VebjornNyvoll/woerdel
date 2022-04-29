@@ -18,6 +18,7 @@ public class Wordle{
     private char[] yellowLetters = {'?','?','?','?','?'};
 
     public void setStarWarsMode(boolean bool){
+        // Sets the starWarsMode boolean and saves it to starWarsMode.txt
         starWarsMode = bool;
         ISaveHandler saveHandler = new SaveHandler();
         saveHandler.writeToFile(String.valueOf(bool), "Wordle/starWarsMode.txt");
@@ -25,8 +26,9 @@ public class Wordle{
     }
 
     public void loadStarWarsMode() throws FileNotFoundException{
+        // Loads the starWarsMode boolean from starWarsMode.txt
         ISaveHandler saveHandler = new SaveHandler();
-        starWarsMode = Boolean.parseBoolean(saveHandler.readStarWarsMode());
+        starWarsMode = Boolean.parseBoolean(saveHandler.readOneLiner("Wordle/starWarsMode.txt"));
     }
 
     public boolean isStarWarsMode(){
@@ -34,9 +36,9 @@ public class Wordle{
     }
 
     public void swapLanguage() throws FileNotFoundException{
+        // Changes possibleWords and secretWord when changing starWarsMode.
         if(possibleWordsFilename == "Wordle/possibleWords.txt"){
             possibleWordsFilename = "Wordle/starWarsWords.txt";
-            System.out.println("SWAPPING TO STAR WARS");
             possibleWords.clear();
             readPossibleWords();
             generateSecretWord();
@@ -49,10 +51,12 @@ public class Wordle{
     }
 
     public int getWordsInGridCount(){
+        // Used to calculate position of upcoming words in the grid.
         return wordsInGrid.size();
     }
 
     public void addToWordsInGrid(String word){
+        // Adds word to the wordsInGrid ArrayList.
         wordsInGrid.add(word);
     }
 
@@ -60,48 +64,31 @@ public class Wordle{
         return secretWord;
     }
 
-    public int getPossibleWordCount(){
-        return possibleWords.size();
-    }
-
     public void generateSecretWord() throws FileNotFoundException{
-        SaveHandler saveHandler = new SaveHandler();
-        String previousSecret = saveHandler.readSecretWord();
+        // Attempts to load a saved secretWord and otherwise it generates a new one.
+        ISaveHandler saveHandler = new SaveHandler();
+        String previousSecret = saveHandler.readOneLiner("Wordle/secretWord.txt");
         if(previousSecret == null){
-            System.out.println("Ingen tidligere save funnet. Genererer nytt ord.");
             secretWord = possibleWords.get(new Random().nextInt(possibleWords.size()));
             saveHandler.writeToFile(secretWord, "Wordle/secretWord.txt");
-            System.out.println(secretWord);
+            System.out.println("No previous save found, new secretWord generated: " + secretWord);
         }else{
             secretWord = previousSecret;
-            System.out.println("Tidligere save funnet. Hemmelig ord lastet. " + secretWord);
+            System.out.println("Previous save found. Secret word loaded: " + secretWord);
         }
         
     }
 
-    public void readPossibleWords(){
-        SaveHandler saveHandler = new SaveHandler();
+    public void readPossibleWords() throws FileNotFoundException{
+        // Loads possibleWords from file into the possibleWords ArrayList.
+        ISaveHandler saveHandler = new SaveHandler();
         possibleWords = saveHandler.readPossibleWords(possibleWordsFilename, possibleWords);
         System.out.println("Reading possibleWords!");
     }
 
     public void initiateReadSave(String filename) throws FileNotFoundException{
-    //   InputStream is = this.getClass().getClassLoader().getResourceAsStream(possibleWordsFilename);
-    //   if (is == null) {
-    //       throw new IllegalArgumentException("fant ikke fila sry " + possibleWordsFilename);
-    //   } else {
-    //       try (InputStreamReader isReader = new InputStreamReader(is, StandardCharsets.UTF_8);
-    //       BufferedReader reader = new BufferedReader(isReader)) {
-    //           String line;
-    //           while ((line = reader.readLine()) != null) {
-    //               possibleWords.add(line);
-    //           }
-    //       } catch (IOException ie) {
-    //           ie.printStackTrace();
-    //           System.out.println("dammit");
-    //       }
-    //   }
-        SaveHandler saveHandler = new SaveHandler();
+        // Loads previously guessed words from guessedWords.txt into the guessedWords ArrayList.
+        ISaveHandler saveHandler = new SaveHandler();
         if(saveHandler.hasData("Wordle/guessedWords.txt"))
         guessedWords = saveHandler.readSave("Wordle/guessedWords.txt");
 
@@ -109,28 +96,27 @@ public class Wordle{
     }
 
     public ArrayList<String> getGuessedWords(){
+        // Returns previously guessed words.
         ArrayList<String> guessedWordsCopy = guessedWords;
         return guessedWordsCopy;
     }
 
     public void submitWord(String word){
+        // Adds valid guesses to the guessedWords ArrayList.
         if(checkWord(word)){
             guessedWords.add(word);
-            // Controller creates panes
         }
         else {
-            System.out.println("Word not approved.");
+            System.out.println("Word not approved by checkWord.");
         }
     }
 
     public boolean checkWord(String word){
+        // Checks if a guessed word is valid.
         if(possibleWords.contains(word)){
             return true;
         }
         else{
-            System.out.println("In checkword:");
-            System.out.println(word);
-            System.out.println("returned false.");
             return false;
         }
     }
@@ -140,15 +126,17 @@ public class Wordle{
     }
 
     public void generateColorArrays(String guessedWord, char[] cArray){
+        // Finds out which colors the letters in the guessed word should be by comparing them to the secret word.
         char[] secretArray = secretWord.toCharArray();
         String secretWordCopy = secretWord;
 
+        // Resetter arrays
         for (int k = 0; k<5; k++ ){
             greenLetters[k] = '?';
             yellowLetters[k] = '?';
         }
        
-
+        // Finner grønne bokstaver
         for (int i = 0; i<5; i++ ){
             char l = cArray[i];
             if(l == secretArray[i]){
@@ -158,6 +146,7 @@ public class Wordle{
             }
         }
 
+        // Finner gule bokstaver
         for (int j = 0; j<5; j++ ){
             char l = cArray[j];
             if(secretWordCopy.contains(String.valueOf(l)) && l != greenLetters[j]){
@@ -171,6 +160,7 @@ public class Wordle{
     }
 
     public Character generateCharBoxColor(char[] lowerArray, int i){
+        // Compares chars from the guessed words with green/yellowLetters to find out colour of CharBox.
         if(lowerArray[i] == greenLetters[i]){
             return 'g';
         }
@@ -183,14 +173,27 @@ public class Wordle{
     }
 
     public void wipeSecretAndGuessedWordFile(){
+        // Wipes secretWord/guessedWords.txt for restarts.
         SaveHandler saveHandler = new SaveHandler();
         saveHandler.writeToFile("", "Wordle/secretWord.txt");
         saveHandler.writeToFile("", "Wordle/guessedWords.txt");
     }
 
     public void wipeGuessedWords(){
+        // Wipes the guessedWords and wordsInGrid ArrayLists.
         guessedWords.clear();
         wordsInGrid.clear();
 
+    }
+
+    public String getPossibleWordsFilename(){
+        // For tests
+        return possibleWordsFilename;
+    }
+
+    public List<String> getPossibleWords(){
+        // For tests
+        List<String> possibleWordsCopy = possibleWords;
+        return possibleWordsCopy;
     }
 }

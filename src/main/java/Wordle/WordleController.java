@@ -18,7 +18,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
 public class WordleController {
-    Wordle wordle = new Wordle();
+    private Wordle wordle = new Wordle();
 
     @FXML
     private ImageView titlePicture, starWarsTitle;
@@ -40,6 +40,7 @@ public class WordleController {
 
     @FXML
     private void handleSetStarWars() throws FileNotFoundException{
+        // Called when the Star Wars RadioButton is selected. Enables starWarsMode.
         setStarWars.setDisable(true);
         setEnglish.setDisable(false);
         setEnglish.setSelected(false);
@@ -53,6 +54,7 @@ public class WordleController {
 
     @FXML
     private void handleSetEnglish() throws FileNotFoundException{
+        // Called when the English RadioButton is selected. Disables starWarsMode.
         setStarWars.setDisable(false);
         setEnglish.setDisable(true);
         setEnglish.setSelected(true);
@@ -65,18 +67,21 @@ public class WordleController {
 
     @FXML
     private void handleGuessField() throws IOException{
+        // Called when the user hits enter in the GuessField.
         boolean victory = false;
         ISaveHandler saveHandler = new SaveHandler();
-        if(wordle.checkWord(guessField.getText().toLowerCase())){
-          
-            wordle.submitWord(guessField.getText().toLowerCase());
+        String lowerGuessField = guessField.getText().toLowerCase();
+
+        if(wordle.checkWord(lowerGuessField)){
+            // Submits valid word.
+            wordle.submitWord(lowerGuessField);
             fillGrid(guessField.getText().toUpperCase());
-            saveHandler.writeSave(guessField.getText().toLowerCase(), "Wordle/guessedWords.txt");
+            saveHandler.writeSave(lowerGuessField, "Wordle/guessedWords.txt");
             
             if(guessField.getText().equalsIgnoreCase(wordle.getSecretWord())){
                 victoryAlert();
                 victory = true;
-                // SUBMIT WIN TIL FIL
+                // User won!
             }
 
             if(wordle.getGuessedWordCount() == 6){
@@ -84,15 +89,16 @@ public class WordleController {
                 if(!victory){
                     lossAlert();
                 }
+                // User lost!
             }
             guessField.setText("");
             helpText.setText("");
         }
         else {
-            if(guessField.getText().toLowerCase().length() != 5){
+            if(lowerGuessField.length() != 5){
                 helpText.setText("Ugyldig ord! Ordet ditt må være nøyaktig 5 bokstaver langt!");
             }
-            else if(starWarsTitle.isVisible()==true){
+            else if(wordle.isStarWarsMode()==true){
                 helpText.setText("Ugyldig ord! Ordet ditt må være et gyldig ord i Star Wars! (Og selvfølgelig bare fra mitt personlige utvalg)");
             } 
             else {
@@ -103,6 +109,7 @@ public class WordleController {
     }
 
     private void victoryAlert(){
+        // Called when the user wins.
         Alert victoryAlert = new Alert(AlertType.INFORMATION);
         victoryAlert.setTitle("GRATULERER!");
         victoryAlert.setHeaderText(null);
@@ -112,6 +119,7 @@ public class WordleController {
     }
 
     private void lossAlert(){
+        // Called when the user loses.
         Alert lossAlert = new Alert(AlertType.INFORMATION);
         lossAlert.setTitle("Jeg kondolerer");
         lossAlert.setHeaderText("Du tapte :(");
@@ -121,6 +129,7 @@ public class WordleController {
     }
 
     private void fillGrid(String guessedWord){
+        // Fills the guessed word into the gridpane. Creates CharBox objects from each letter in the guessed word.
         String lowercase = guessedWord.toLowerCase();
         char[] lowerArray = lowercase.toCharArray();
         char[] cArray = guessedWord.toCharArray();
@@ -136,6 +145,7 @@ public class WordleController {
     }
 
     private void initializeInStarWarsMode() throws FileNotFoundException{
+        // Used when starWarsMode.txt is true on initialize.
         setStarWars.setDisable(true);
         setEnglish.setDisable(false);
         setEnglish.setSelected(false);
@@ -147,6 +157,7 @@ public class WordleController {
     
     @FXML
     private void initialize() throws FileNotFoundException{
+        // Intiializes the application. Checks if the game is in starWarsMode and then loads previous save if there is any and fills the grid with loaded guesses.
         wordle.loadStarWarsMode();
         if(wordle.isStarWarsMode()){
             initializeInStarWarsMode();
@@ -158,11 +169,11 @@ public class WordleController {
         for (String word : wordle.getGuessedWords()) {
             fillGrid(word.toUpperCase());
         }
-        System.out.println(wordle.getPossibleWordCount());
     }
 
     @FXML
     private void restart() throws FileNotFoundException{
+        // Restarts the game by wiping saves and generating new words.
         clearCharGrid();
         wordle.wipeSecretAndGuessedWordFile();
         wordle.wipeGuessedWords();
@@ -172,12 +183,15 @@ public class WordleController {
     }
 
     private void clearCharGrid(){
+        // Clears the grid of CharBox objects. 
+        // setGridLinesVisible(false) and then (true) is called because the GridLinesVisible is stored within the first node in the grid, which is also wiped when calling clear.
         charGrid.setGridLinesVisible(false);
         charGrid.getChildren().clear();
         charGrid.setGridLinesVisible(true);
     }
 
     private BorderPane createPane(CharBox cBox){
+        // Creates panes from CharBox to fill the gridpane. Mostly just styling.
         BorderPane bpane = new BorderPane();
         Label label = new Label(cBox.getLetter().toString());
 
