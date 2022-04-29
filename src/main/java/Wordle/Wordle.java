@@ -126,9 +126,14 @@ public class Wordle{
     }
 
     public void generateColorArrays(String guessedWord, char[] cArray){
-        // Finds out which colors the letters in the guessed word should be by comparing them to the secret word.
+        // Finds out which index of the word should have which color by comparing the guessed word to the secret word.
         char[] secretArray = secretWord.toCharArray();
         String secretWordCopy = secretWord;
+
+        
+        if(cArray.length!=5){
+            throw new IllegalArgumentException("cArray length is not 5. Actual length is: " + cArray.length);
+        }
 
         // Resetter arrays
         for (int k = 0; k<5; k++ ){
@@ -195,5 +200,23 @@ public class Wordle{
         // For tests
         List<String> possibleWordsCopy = possibleWords;
         return possibleWordsCopy;
+    }
+
+    public char[] getGreenLetters(){
+        // For tests
+        char[] greenLettersCopy = greenLetters;
+        return greenLettersCopy;
+    }
+
+    public char[] getYellowLetters(){
+        // For tests
+        char[] yellowLettersCopy = yellowLetters;
+        return yellowLettersCopy;
+    }
+
+    public void setSecretWord(String secretWord){
+        // For tests
+        if(checkWord(secretWord))
+        this.secretWord = secretWord;
     }
 }

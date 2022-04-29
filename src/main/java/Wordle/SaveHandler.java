@@ -83,7 +83,7 @@ public class SaveHandler implements ISaveHandler{
             BufferedReader reader = new BufferedReader(isReader)) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if(line.length() == 5 && !line.contains("*") && !line.contains("^")){
+                    if(line.length() == 5 && !line.contains("*") && !line.contains("^") && !line.contains("?")){
                         list.add(line.toLowerCase());
                     }
                     

@@ -2,7 +2,6 @@ package Wordle;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
