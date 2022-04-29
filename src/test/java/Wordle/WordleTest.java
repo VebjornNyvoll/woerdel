@@ -9,7 +9,9 @@ import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class WordleTest {
     private Wordle wordle;
 
@@ -26,10 +28,10 @@ public class WordleTest {
         wordle.generateSecretWord();
        
         List<String> possibleWords = wordle.getPossibleWords();
-        
+        // Sammenlikner med antall ord i fila, må oppdateres manuelt dersom det legges til nye ord
         assertEquals(12947, possibleWords.size(), "Sjekker antallet i possibleWords før swap");
         wordle.swapLanguage();
-        assertEquals(76, possibleWords.size(), "Sjekker antallet i possibleWords etter swap");
+        assertEquals(77, possibleWords.size(), "Sjekker antallet i possibleWords etter swap");
         assertEquals("Wordle/starWarsWords.txt", wordle.getPossibleWordsFilename());
 
         wordle.swapLanguage();
