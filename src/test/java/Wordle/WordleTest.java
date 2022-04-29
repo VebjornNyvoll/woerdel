@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -108,9 +109,7 @@ public class WordleTest {
    public void testWipeSecretGuessedWordFile() throws FileNotFoundException{
        ISaveHandler saveHandler = new SaveHandler();
        saveHandler.writeToFile("helps\nplead\ndeath\n", "Wordle/guessedWords.txt");
-        wordle.readPossibleWords();
-        wordle.generateSecretWord();
-        wordle.initiateReadSave("Wordle/guessedWords.txt");
+
         ArrayList<String> expectedGuessedWords = new ArrayList<>();
         expectedGuessedWords.add("helps");
         expectedGuessedWords.add("plead");
@@ -123,4 +122,10 @@ public class WordleTest {
 
         assertEquals(expectedGuessedWords, saveHandler.readSave("Wordle/guessedWords.txt"));
    }
+
+   @AfterAll
+   public void teardown(){
+       wordle.wipeSecretAndGuessedWordFile();
+   }
+
 }
