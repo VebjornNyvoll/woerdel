@@ -80,6 +80,7 @@ public class WordleController {
             if(guessField.getText().equalsIgnoreCase(wordle.getSecretWord())){
                 victoryAlert();
                 victory = true;
+                guessField.setEditable(false);
                 // User won!
             }
 
