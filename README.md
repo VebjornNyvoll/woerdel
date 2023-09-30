@@ -11,5 +11,3 @@ I den vanlige "English"-modusen kan man gjette så å si alle engelske ord på f
 Appen lagrer alltid hvor langt du er i spillet, så dersom du f.eks. har gjettet to ord, lukker appen og åpner den igjen vil du fortsette akkurat der du slapp! :) 
 
 LYKKE TIL! :D
-
-Kandidatnr.: 10404
